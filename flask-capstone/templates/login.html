@@ -1,0 +1,98 @@
+    <!-- templates/login.html -->
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LogiSync AI - Gate Center</title>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <style>
+            body { background-color: #12141C; color: #F3F4F6; }
+        </style>
+    </head>
+    <body class="font-sans antialiased flex items-center justify-center h-screen">
+        <div class="w-full max-w-md bg-[#1E2230] p-8 rounded-2xl border border-gray-800 shadow-2xl">
+            
+            <!-- Logo -->
+            <div class="flex justify-center items-center space-x-2 mb-6 text-center w-full">
+                <span class="text-3xl text-[#00D2FF]">⚡</span>
+                <span class="text-xl font-black text-[#00D2FF] tracking-wider">LOGISYNC AI</span>
+            </div>
+
+            <!-- TAB LOGIN FORM -->
+            <div id="loginForm">
+                <h2 class="text-lg font-bold text-white mb-1">Sign In Command Center</h2>
+                <p class="text-xs text-gray-400 mb-6">Akses kontrol telemetri pengemudi logistik.</p>
+
+                <form action="/api/auth/login-manual" method="POST" class="space-y-4">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Email Address</label>
+                        <input type="email" name="email" required class="w-full bg-[#12141C] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00D2FF]">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Password</label>
+                        <input type="password" name="password" required class="w-full bg-[#12141C] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00D2FF]">
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-[#00D2FF] hover:bg-[#00b2da] text-gray-900 font-bold rounded-xl text-sm transition duration-150 shadow-lg">
+                        Login Platform
+                    </button>
+                </form>
+
+                <div class="relative my-6 text-center">
+                    <span class="absolute inset-x-0 top-1/2 h-px bg-gray-800 -z-10"></span>
+                    <span class="bg-[#1E2230] px-3 text-xs text-gray-500 font-mono uppercase">Atau Lewat</span>
+                </div>
+
+                <!-- Google Button -->
+                <a href="/api/auth/login/google" class="flex items-center justify-center space-x-2 w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-xl text-sm shadow-md transition">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.859-3.578-7.859-8s3.53-8 7.859-8c2.46 0 4.105 1.025 5.047 1.926l3.227-3.103C18.22 2.016 15.498 1 12.24 1 6.033 1 12.24 6.033 1 12.24s5.033 11.24 11.24 11.24c6.478 0 10.793-4.537 10.793-10.986 0-.743-.08-1.313-.177-1.714H12.24z"/></svg>
+                    <span>Sign In with Google</span>
+                </a>
+
+                <p class="text-xs text-center text-gray-400 mt-6">
+                    Belum terdaftar? <button onclick="toggleForm()" class="text-[#00D2FF] hover:underline font-semibold focus:outline-none">Buat Akun Baru</button>
+                </p>
+            </div>
+
+            <!-- TAB REGISTRATION FORM (HIDDEN BY DEFAULT) -->
+            <div id="registerForm" class="hidden">
+                <h2 class="text-lg font-bold text-white mb-1">Create Admin Account</h2>
+                <p class="text-xs text-gray-400 mb-6">Daftarkan identitas baru pengelola instansi.</p>
+
+                <form action="/api/auth/register-manual" method="POST" class="space-y-4">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Nama Lengkap (User)</label>
+                        <input type="text" name="name" required class="w-full bg-[#12141C] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00D2FF]">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Alamat Email</label>
+                        <input type="email" name="email" required class="w-full bg-[#12141C] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00D2FF]">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Password Baru</label>
+                        <input type="password" name="password" required class="w-full bg-[#12141C] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#00D2FF]">
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition duration-150 shadow-lg">
+                        Daftarkan Akun
+                    </button>
+                </form>
+
+                <p class="text-xs text-center text-gray-400 mt-6">
+                    Sudah punya akun? <button onclick="toggleForm()" class="text-[#00D2FF] hover:underline font-semibold focus:outline-none">Silakan Login</button>
+                </p>
+            </div>
+
+        </div>
+
+        <!-- SCRIPT SWITCH TOGGLE PANEL -->
+        <script>
+            function toggleForm() {
+                const loginBox = document.getElementById('loginForm');
+                const regisBox = document.getElementById('registerForm');
+                
+                loginBox.classList.toggle('hidden');
+                regisBox.classList.toggle('hidden');
+            }
+        </script>
+    </body>
+    </html>

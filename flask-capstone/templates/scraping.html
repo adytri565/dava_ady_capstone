@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Data Hasil Scraping & Analisis</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tanggal</th>
+                <th>Judul (Cleaned)</th>
+                <th>Konten (Cleaned)</th>
+            </tr>
+        </thead>
+        <tbody id="scrape-table-body">
+            <!-- Data akan dimuat disini lewat JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    fetch('http://localhost:4000/api/scrape/data')
+        .then(response => response.json())
+        .then(result => {
+            if(result.status === "success") {
+                let tbody = document.getElementById('scrape-table-body');
+                tbody.innerHTML = "";
+                result.data.forEach(item => {
+                    let row = `<tr>
+                        <td>${item.id}</td>
+                        <td>${item.date}</td>
+                        <td>${item.title}</td>
+                        <td>${item.content}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            }
+        })
+        .catch(err => console.error("Gagal memuat data:", err));
+</script>
+{% endblock %}

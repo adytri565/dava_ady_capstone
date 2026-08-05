@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="p-6 bg-gray-50 min-h-screen">
+    
+    <div class="mb-6 flex flex-col md:flex-row md:justify-between md:items-end">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Fleet Telemetry Analytics</h1>
+            <p class="text-gray-500">Integrasi Big Data: Biometrik Real-time & Konteks Eksternal</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <label for="timeRange" class="text-sm font-semibold text-gray-600 mr-2">Rentang Waktu:</label>
+            <select id="timeRange" onchange="changeTimeRange()" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 shadow-sm font-semibold cursor-pointer">
+                <option value="today" {% if current_range == 'today' %}selected{% endif %}>📅 Hari Ini</option>
+                <option value="7days" {% if current_range == '7days' %}selected{% endif %}>📅 7 Hari Terakhir</option>
+                <option value="30days" {% if current_range == '30days' %}selected{% endif %}>📅 30 Hari Terakhir</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-blue-500">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Total Insiden Kantuk</h3>
+            <p class="text-3xl font-bold text-gray-700 mt-2">{{ data.total_insiden }} <span class="text-sm font-normal text-gray-500">Kejadian</span></p>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-purple-500">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Kondisi Cuaca (Simulasi)</h3>
+            <p class="text-3xl font-bold text-gray-700 mt-2">Dinamis <span class="text-sm font-normal text-gray-500">API</span></p>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-red-500">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Peringatan Blackspot</h3>
+            <p class="text-3xl font-bold text-gray-700 mt-2">{{ data.total_blackspot }} <span class="text-sm font-normal text-gray-500">Insiden di Zona Rawan</span></p>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
+        <h2 class="text-xl font-bold text-gray-800">1. Tren Insiden Biometrik (Internal)</h2>
+        <p class="text-sm text-gray-500 mb-4">Grafik ini merepresentasikan akumulasi deteksi kantuk (EAR < 0.2) dan status kritis pengemudi berdasarkan sensor kamera AI.</p>
+        <div class="relative h-72 w-full">
+            <canvas id="internalChart" data-labels='{{ data.chart_labels | tojson | safe }}' data-internal='{{ data.chart_internal | default([]) | tojson | safe }}'></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
+        <h2 class="text-xl font-bold text-gray-800">2. Tren Faktor Risiko (Eksternal)</h2>
+        <p class="text-sm text-gray-500 mb-4">Grafik ini merepresentasikan tingkat risiko lingkungan, mencakup zona blackspot dan kondisi cuaca ekstrem yang memengaruhi keselamatan.</p>
+        <div class="relative h-72 w-full">
+            <canvas id="externalChart" data-labels='{{ data.chart_labels | tojson | safe }}' data-external='{{ data.chart_external | default([]) | tojson | safe }}'></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm">
+        <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 md:mb-0">Log Telemetri (Data Lake)</h2>
+            <select id="statusFilter" onchange="filterTable()" class="border border-gray-300 rounded-md shadow-sm p-2 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="ALL">🔍 Tampilkan Semua Status</option>
+                <option value="KRITIS">🚨 Hanya Status Kritis</option>
+                <option value="MENGANTUK">⚠️ Hanya Status Mengantuk</option>
+                <option value="FOCUSED">✅ Hanya Status Fokus</option>
+            </select>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse" id="telemetryTable">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
+                        <th class="p-4 border-b">Waktu (WIB)</th>
+                        <th class="p-4 border-b">Driver</th>
+                        <th class="p-4 border-b">Biometrik AI (Internal)</th>
+                        <th class="p-4 border-b">Konteks Lingkungan (Eksternal)</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    {% for log in data.telemetry %}
+                    <tr class="hover:bg-gray-50 transition-colors" data-status="{{ log.status_ai }}">
+                        <td class="p-4 border-b whitespace-nowrap">{{ log.timestamp }}</td>
+                        <td class="p-4 border-b font-semibold">{{ log.driver_name }}</td>
+                        <td class="p-4 border-b">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {% if log.status_ai == 'KRITIS' %}bg-red-100 text-red-700{% elif log.status_ai == 'MENGANTUK' %}bg-yellow-100 text-yellow-700{% else %}bg-green-100 text-green-700{% endif %}">
+                                {{ log.status_ai }}
+                            </span>
+                        </td>
+                        <td class="p-4 border-b">{{ log.weather }} {% if log.is_blackspot %}<br><b class="text-red-600 text-[10px]">📍 BLACKSPOT</b>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+let internalChartInstance, externalChartInstance;
+
+function renderCharts(labels, internal, external) {
+    const intCanvas = document.getElementById('internalChart');
+    const extCanvas = document.getElementById('externalChart');
+    const commonOptions = {
+        animation: { duration: 800, easing: 'easeOutQuart' },
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { title: { display: true, text: 'Waktu / Tanggal' } }
+        }
+    };
+
+    if (internalChartInstance) internalChartInstance.destroy();
+    if (externalChartInstance) externalChartInstance.destroy();
+
+    internalChartInstance = new Chart(intCanvas.getContext('2d'), {
+        type: 'line',
+        data: { labels, datasets: [{ data: internal, borderColor: '#ef4444', fill: true, tension: 0.4, backgroundColor: '#ef44441A' }] },
+        options: commonOptions
+    });
+
+    externalChartInstance = new Chart(extCanvas.getContext('2d'), {
+        type: 'line',
+        data: { labels, datasets: [{ data: external, borderColor: '#3b82f6', fill: true, tension: 0.4, backgroundColor: '#3b82f61A' }] },
+        options: commonOptions
+    });
+}
+
+function renderTable(rows) {
+    const tbody = document.querySelector('#telemetryTable tbody');
+    tbody.innerHTML = rows.map(log => `
+        <tr class="hover:bg-gray-50 transition-colors" data-status="${log.status_ai}">
+            <td class="p-4 border-b whitespace-nowrap">${log.timestamp}</td>
+            <td class="p-4 border-b font-semibold">${log.driver_name}</td>
+            <td class="p-4 border-b">
+                <span class="px-3 py-1 rounded-full text-xs font-bold ${
+                    log.status_ai === 'KRITIS' ? 'bg-red-100 text-red-700' :
+                    log.status_ai === 'MENGANTUK' ? 'bg-yellow-100 text-yellow-700' :
+                    'bg-green-100 text-green-700'
+                }">${log.status_ai}</span>
+            </td>
+            <td class="p-4 border-b">${log.weather} ${log.is_blackspot ? '<br><b class="text-red-600 text-[10px]">📍 BLACKSPOT</b>' : ''}</td>
+        </tr>
+    `).join('');
+    filterTable();
+}
+
+async function loadDashboard(range) {
+    const res = await fetch(`/api/dashboard/data?range=${range}`);
+    const data = await res.json();
+
+    document.getElementById('kpiInsiden').textContent = data.total_insiden;
+    document.getElementById('kpiBlackspot').textContent = data.total_blackspot;
+
+    renderCharts(data.chart_labels, data.chart_internal, data.chart_external);
+    renderTable(data.telemetry);
+
+    history.replaceState(null, '', `/dashboard?range=${range}`);
+}
+
+function changeTimeRange() {
+    loadDashboard(document.getElementById("timeRange").value);
+}
+
+function filterTable() {
+    const val = document.getElementById("statusFilter").value;
+    document.querySelectorAll("#telemetryTable tbody tr").forEach(row => {
+        row.style.display = (val === "ALL" || row.dataset.status === val) ? "" : "none";
+    });
+}
+
+// initial render dari data yang sudah di-render server-side
+document.addEventListener('DOMContentLoaded', () => {
+    const intCanvas = document.getElementById('internalChart');
+    const extCanvas = document.getElementById('externalChart');
+    renderCharts(
+        JSON.parse(intCanvas.dataset.labels),
+        JSON.parse(intCanvas.dataset.internal),
+        JSON.parse(extCanvas.dataset.external)
+    );
+});
+</script>
+{% endblock %}

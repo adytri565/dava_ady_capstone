@@ -1,0 +1,3 @@
+flask
+strawberry-graphql[flask]
+requests

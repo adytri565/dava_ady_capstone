@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - logisync-net
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "5001:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/auth_db
+    depends_on:
+      - mongodb
+    networks:
+      - logisync-net
+
+  drowsiness-service:
+    build: ./drowsiness-service
+    container_name: drowsiness-service
+    ports:
+      - "5002:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/detection_db
+    depends_on:
+      - mongodb
+    networks:
+      - logisync-net
+
+  graphql-gateway:
+    build: ./gateway
+    container_name: graphql-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:5000
+      - DETECT_SERVICE_URL=http://drowsiness-service:5000
+    depends_on:
+      - auth-service
+      - drowsiness-service
+    networks:
+      - logisync-net
+
+networks:
+  logisync-net:
+    driver: bridge

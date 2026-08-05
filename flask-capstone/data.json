@@ -1,0 +1,52 @@
+{
+    "stats": {
+        "total_vehicles": 42,
+        "active_drivers": 15,
+        "critical_alerts": 2
+    },
+    "user": {
+        "id": "ADM-092",
+        "name": "Ady Tri",
+        "role": "Lead Administrator",
+        "email": "ady.tri@logisync.ai",
+        "phone": "+62 812-2445-8891",
+        "location": "Brebes, Central Java",
+        "status": "Active",
+        "created_at": "12 Jan 2026"
+    },
+    "drivers": [
+        {
+            "id": "DRV001",
+            "name": "Budi Santoso",
+            "vehicle": "G 1928 FA",
+            "status": "FOCUSED",
+            "avatar": "\ud83d\udc68\u200d\u2708\ufe0f",
+            "ear": 0.28,
+            "blink_rate": 15,
+            "speed": 65,
+            "phone": "+628111222333"
+        },
+        {
+            "id": "DRV002",
+            "name": "Ahmad Fauzi",
+            "vehicle": "G 8821 EA",
+            "status": "Drowsy",
+            "avatar": "\ud83d\udc68\u200d\u2708\ufe0f",
+            "ear": 0.18,
+            "blink_rate": 25,
+            "speed": 72,
+            "phone": "+628111222334"
+        },
+        {
+            "id": "DRV003",
+            "name": "Joko Susilo",
+            "vehicle": "G 4412 BA",
+            "status": "Tired",
+            "avatar": "\ud83d\udc68\u200d\u2708\ufe0f",
+            "ear": 0.22,
+            "blink_rate": 21,
+            "speed": 55,
+            "phone": "+628111222335"
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-[#1E2230] p-6 rounded-2xl border border-gray-800 shadow-xl flex justify-between items-center">
+        <div>
+            <h2 class="text-xl font-bold text-gray-200 mb-1">AI Alert Log Center</h2>
+            <p class="text-sm text-gray-400">Daftar rekaman kejadian indikasi kantuk atau microsleep yang dideteksi oleh sistem AI.</p>
+        </div>
+    </div>
+
+    <div class="bg-[#1E2230] p-6 rounded-2xl border border-gray-800 shadow-xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-gray-800 text-gray-400 text-sm">
+                        <th class="pb-3 font-semibold">Log ID</th>
+                        <th class="pb-3 font-semibold">Waktu / Tanggal</th>
+                        <th class="pb-3 font-semibold">Driver</th>
+                        <th class="pb-3 font-semibold">Jenis Pelanggaran AI</th>
+                        <th class="pb-3 font-semibold">Tingkat Bahaya</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800/50 text-sm text-gray-300">
+                    {% for log in data.logs %}
+                    <tr class="hover:bg-gray-800/20 transition">
+                        <td class="py-4 font-mono text-xs text-gray-500">{{ log.id }}</td>
+                        <td class="py-4 text-xs font-mono">
+                            <span class="text-white font-semibold">{{ log.time }}</span> | {{ log.date }}
+                        </td>
+                        <td class="py-4">
+                            <div class="font-medium text-gray-200">{{ log.driver }}</div>
+                            <div class="text-xs text-gray-500 font-mono">{{ log.vehicle }}</div>
+                        </td>
+                        <td class="py-4 font-medium">{{ log.event }}</td>
+                        <td class="py-4">
+                            {% if log.severity == 'Critical' %}
+                                <span class="px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold rounded">CRITICAL</span>
+                            {% else %}
+                                <span class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-xs font-bold rounded">WARNING</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

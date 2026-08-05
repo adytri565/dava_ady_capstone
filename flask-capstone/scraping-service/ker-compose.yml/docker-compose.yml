@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  # Service yang sudah ada (gateway, auth, dll sesuaikan dengan project Anda)
+  
+  scraping-service:
+    build: ./scraping-service
+    container_name: scraping-service
+    ports:
+      - "5003:5003"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/ # Sesuaikan jika menggunakan container mongodb di docker-compose
+    depends_on:
+      - mongo # Jika menggunakan service mongodb di compose

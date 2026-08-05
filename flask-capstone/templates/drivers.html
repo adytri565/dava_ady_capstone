@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-[#1E2230] p-6 rounded-2xl border border-gray-800 shadow-xl">
+        <h2 class="text-xl font-bold text-gray-200 mb-2"> Driver Condition Monitoring</h2>
+        <p class="text-sm text-gray-400">Analisis biometrik mata dan telemetri kecepatan pengemudi secara real-time dari perangkat mobile.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for driver in data.drivers %}
+        <div class="bg-[#1E2230] p-6 rounded-2xl border border-gray-800 shadow-xl relative overflow-hidden">
+            <div class="absolute top-4 right-4">
+                {% if driver.status == 'Drowsy' or driver.status == 'Drowsiness Detected' %}
+                    <span class="px-3 py-1 bg-red-500/10 text-red-500 text-xs font-bold rounded-full border border-red-500/20 animate-pulse"> DROWSY</span>
+                {% elif driver.status == 'Tired' %}
+                    <span class="px-3 py-1 bg-yellow-500/10 text-yellow-500 text-xs font-bold rounded-full border border-yellow-500/20">TIRED</span>
+                {% else %}
+                    <span class="px-3 py-1 bg-green-500/10 text-[#00E676] text-xs font-bold rounded-full border border-green-500/20">FOCUSED</span>
+                {% endif %}
+            </div>
+
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-2xl">
+                    {{ driver.avatar if driver.avatar else '👨‍✈️' }}
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white">{{ driver.name }}</h3>
+                    <p class="text-xs text-[#00D2FF] font-mono">{{ driver.id }} • {{ driver.vehicle }}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 bg-[#12141C] p-4 rounded-xl border border-gray-800 mb-4">
+                <div>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-wider">Eye Aspect (EAR)</p>
+                    <p class="text-lg font-mono font-bold mt-1 {% if driver.ear < 0.21 %}text-red-500{% else %}text-[#00E676]{% endif %}">
+                        {{ driver.ear }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-wider">Blink Rate / Min</p>
+                    <p class="text-lg font-mono font-bold mt-1 {% if driver.blink_rate > 20 %}text-red-500{% else %}text-white{% endif %}">
+                        {{ driver.blink_rate }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-wider">Kecepatan</p>
+                    <p class="text-lg font-mono font-bold mt-1 text-[#00D2FF]">
+                        {{ driver.speed }} <span class="text-[10px] text-gray-500 font-sans">Km/h</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex space-x-2">
+                <a href="tel:{{ driver.phone }}" class="text-center text-xs bg-gray-800 hover:bg-gray-700 text-white font-medium py-2.5 px-4 rounded-lg transition flex-1">
+                    Hubungi Driver
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
