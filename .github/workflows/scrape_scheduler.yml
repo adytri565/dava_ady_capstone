@@ -3,7 +3,7 @@ name: Automated Web Scraping
 on:
   schedule:
     - cron: '0 */5 * * *'
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -20,7 +20,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 pymongo apscheduler
+          pip install requests beautifulsoup4 pymongo
 
       - name: Run Scraper Script
         env:
