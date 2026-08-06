@@ -126,6 +126,8 @@ function renderCharts(labels, internal, external) {
 
 function renderTable(rows) {
     const tbody = document.querySelector('#telemetryTable tbody');
+    if (!tbody) return;
+    
     tbody.innerHTML = rows.map(log => `
         <tr class="hover:bg-gray-50 transition-colors" data-status="${log.status_ai}">
             <td class="p-4 border-b whitespace-nowrap">${log.timestamp}</td>
@@ -143,21 +145,31 @@ function renderTable(rows) {
     filterTable();
 }
 
+// Fungsi utama untuk memuat data dari API Flask berdasarkan range waktu
 async function loadDashboard(range) {
-    const res = await fetch(`/api/dashboard/data?range=${range}`);
-    const data = await res.json();
+    try {
+        const res = await fetch(`/api/dashboard/data?range=${range}`);
+        const data = await res.json();
 
-    document.getElementById('kpiInsiden').textContent = data.total_insiden;
-    document.getElementById('kpiBlackspot').textContent = data.total_blackspot;
+        // Update nilai Total Insiden & Blackspot di kotak atas
+        document.getElementById('kpiInsiden').textContent = data.total_insiden;
+        document.getElementById('kpiBlackspot').textContent = data.total_blackspot;
 
-    renderCharts(data.chart_labels, data.chart_internal, data.chart_external);
-    renderTable(data.telemetry);
+        // Render ulang grafik dan tabel dengan data baru
+        renderCharts(data.chart_labels, data.chart_internal, data.chart_external);
+        renderTable(data.telemetry);
 
-    history.replaceState(null, '', `/dashboard?range=${range}`);
+        // Ubah URL browser tanpa reload halaman (URL History)
+        history.replaceState(null, '', `/dashboard?range=${range}`);
+    } catch (err) {
+        console.error("Gagal memuat data dashboard:", err);
+    }
 }
 
+// Dipanggil saat dropdown rentang waktu diganti
 function changeTimeRange() {
-    loadDashboard(document.getElementById("timeRange").value);
+    const selectedRange = document.getElementById("timeRange").value;
+    loadDashboard(selectedRange);
 }
 
 function filterTable() {
@@ -167,15 +179,17 @@ function filterTable() {
     });
 }
 
-// initial render dari data yang sudah di-render server-side
+// Initial render saat halaman pertama kali dibuka
 document.addEventListener('DOMContentLoaded', () => {
     const intCanvas = document.getElementById('internalChart');
     const extCanvas = document.getElementById('externalChart');
-    renderCharts(
-        JSON.parse(intCanvas.dataset.labels),
-        JSON.parse(intCanvas.dataset.internal),
-        JSON.parse(extCanvas.dataset.external)
-    );
+    if (intCanvas && extCanvas) {
+        renderCharts(
+            JSON.parse(intCanvas.dataset.labels || '[]'),
+            JSON.parse(intCanvas.dataset.internal || '[]'),
+            JSON.parse(extCanvas.dataset.external || '[]')
+        );
+    }
 });
 </script>
 {% endblock %}

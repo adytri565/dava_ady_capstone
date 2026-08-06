@@ -18,19 +18,28 @@
                     <span class="text-2xl text-[#00D2FF]"></span>
                     <span class="text-xl font-bold text-[#00D2FF] tracking-wider">LOGISYNC AI</span>
                 </div>
-                <nav class="space-y-2">
-                    <a href="{{ url_for('dashboard_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
-                        <span></span> <span>Overview Dashboard</span>
-                    </a>
-                    <a href="{{ url_for('map_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
-                        <span></span> <span>Live Fleet Map</span>
-                    </a>
-                    <a href="{{ url_for('drivers_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
-                        <span></span> <span>Driver Monitor</span>
-                    </a>
-                    <a href="{{ url_for('alerts_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
-                        <span></span> <span>Alert Center</span>
-                    </a>
+               <nav class="space-y-2">
+    <a href="{{ url_for('dashboard_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
+        <span>📊</span> <span>Overview Dashboard</span>
+    </a>
+    <a href="{{ url_for('map_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
+        <span>🗺️</span> <span>Live Fleet Map</span>
+    </a>
+    <a href="{{ url_for('drivers_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
+        <span>🚛</span> <span>Driver Monitor</span>
+    </a>
+    <a href="{{ url_for('alerts_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
+        <span>🚨</span> <span>Alert Center</span>
+    </a>
+    
+    <!-- Menu Scraping & Analytics yang Aman -->
+    <a href="{{ url_for('scraping_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
+        <span>🌐</span> <span>Data & Scraping</span>
+    </a>
+    <a href="{{ url_for('analytics_view') }}" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition">
+        <span>📈</span> <span>Analytics Chart</span>
+    </a>
+</nav>
                 </nav>
             </div>
             

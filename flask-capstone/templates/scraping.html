@@ -1,40 +1,192 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Data Hasil Scraping & Analisis</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Tanggal</th>
-                <th>Judul (Cleaned)</th>
-                <th>Konten (Cleaned)</th>
-            </tr>
-        </thead>
-        <tbody id="scrape-table-body">
-            <!-- Data akan dimuat disini lewat JavaScript -->
-        </tbody>
-    </table>
+
+<!-- Library Chart.js (Opsional untuk statistik mini jika diperlukan) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="space-y-6">
+    <!-- Header Halaman -->
+    <div class="bg-[#1E2230] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-white tracking-wide">🌐 Data Scraping & Automated Intelligence</h1>
+            <p class="text-sm text-gray-400 mt-1">Pusat kendali crawling otomatis, validasi duplikat database, dan preprocessing teks berita logistik.</p>
+        </div>
+        <a href="/analytics-view" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg flex items-center space-x-2">
+            <span>📈</span> <span>Lihat Grafik Analitik</span>
+        </a>
+    </div>
+
+    <!-- CONTROL PANEL GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- KARTU 1: SCRAPING MANUAL -->
+        <div class="bg-[#1E2230] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col justify-between">
+            <div>
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="p-3 bg-green-500/10 text-green-400 rounded-xl text-lg border border-green-500/20">⚡</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Scraping Real-Time</h3>
+                        <p class="text-xs text-gray-400">Tarik data berita terbaru dari internet sekarang juga.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-300 bg-[#12141C] p-4 rounded-xl border border-gray-800/80 mb-6">
+                    "Tombol interaktif untuk memicu proses pengambilan data, pembersihan teks, dan penyaringan duplikat secara langsung."
+                </p>
+            </div>
+            <div>
+                <button id="btn-manual-scrape" class="w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg flex items-center justify-center space-x-2">
+                    <span>▶️</span> <span>Mulai Scraping Sekarang</span>
+                </button>
+                <div id="manual-status" class="mt-3 text-sm font-medium text-center"></div>
+            </div>
+        </div>
+
+        <!-- KARTU 2: PENGATURAN JADWAL (SCHEDULER) -->
+        <div class="bg-[#1E2230] p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col justify-between">
+            <div>
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="p-3 bg-yellow-500/10 text-yellow-400 rounded-xl text-lg border border-yellow-500/20">⏰</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Automatisasi Jadwal</h3>
+                        <p class="text-xs text-gray-400">Atur interval waktu background crawling secara periodik.</p>
+                    </div>
+                </div>
+                <div class="bg-[#12141C] p-4 rounded-xl border border-gray-800/80 mb-6 space-y-3">
+                    <label for="schedule-hours" class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Pilih Interval Waktu Sistem:</label>
+                    <div class="flex space-x-2">
+                        <select id="schedule-hours" class="bg-[#1E2230] border border-gray-700 text-white text-sm rounded-xl focus:ring-yellow-500 focus:border-yellow-500 p-2.5 flex-1 cursor-pointer">
+                            <option value="1">Setiap 1 Jam</option>
+                            <option value="5" selected>Setiap 5 Jam (Default)</option>
+                            <option value="12">Setiap 12 Jam</option>
+                            <option value="24">Setiap 24 Jam (1 Hari)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button id="btn-save-schedule" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg flex items-center justify-center space-x-2">
+                    <span>💾</span> <span>Simpan Pengaturan Jadwal</span>
+                </button>
+                <div id="schedule-status" class="mt-3 text-sm font-medium text-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KARTU TABEL DATA LAKE -->
+    <div class="bg-[#1E2230] p-6 rounded-2xl border border-gray-800 shadow-xl">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h3 class="text-lg font-bold text-white">📑 Repositori Data Terkumpul (Data Lake)</h3>
+                <p class="text-xs text-gray-400">Daftar berita logistik bersih yang berhasil divalidasi dari duplikat.</p>
+            </div>
+            <button onclick="loadTableData()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs px-3 py-2 rounded-xl transition border border-gray-700 flex items-center space-x-1">
+                <span>🔄</span> <span>Muat Ulang Tabel</span>
+            </button>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-gray-800">
+            <table class="w-full text-left border-collapse" id="scrape-table">
+                <thead>
+                    <tr class="bg-[#12141C] text-gray-400 text-xs uppercase tracking-wider">
+                        <th class="p-4 border-b border-gray-800">ID / Sumber</th>
+                        <th class="p-4 border-b border-gray-800">Tanggal Pencatatan</th>
+                        <th class="p-4 border-b border-gray-800">Judul Berita (Cleaned)</th>
+                        <th class="p-4 border-b border-gray-800">Ringkasan Konten (Cleaned)</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-300 text-sm divide-y divide-gray-800/60" id="scrape-table-body">
+                    <!-- Data dimuat lewat JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
-    fetch('http://localhost:4000/api/scrape/data')
-        .then(response => response.json())
-        .then(result => {
-            if(result.status === "success") {
-                let tbody = document.getElementById('scrape-table-body');
+    // --- 1. Fungsi Memuat Tabel Data ---
+    function loadTableData() {
+        let tbody = document.getElementById('scrape-table-body');
+        tbody.innerHTML = "<tr><td colspan='4' class='text-center py-6 text-gray-500'>Sedang memuat data dari database...</td></tr>";
+
+        fetch('http://127.0.0.1:4000/api/scrape/data')
+            .then(response => response.json())
+            .then(result => {
                 tbody.innerHTML = "";
-                result.data.forEach(item => {
-                    let row = `<tr>
-                        <td>${item.id}</td>
-                        <td>${item.date}</td>
-                        <td>${item.title}</td>
-                        <td>${item.content}</td>
-                    </tr>`;
-                    tbody.innerHTML += row;
-                });
-            }
+                let dataArray = Array.isArray(result) ? result : (result.data || []);
+
+                if (dataArray.length > 0) {
+                    dataArray.forEach(item => {
+                        let title = item.title_cleaned || item.title || '-';
+                        let content = item.content_cleaned || item.content || '-';
+                        
+                        let row = `<tr class="hover:bg-gray-800/30 transition-colors">
+                            <td class="p-4 whitespace-nowrap"><span class="px-2.5 py-1 rounded-lg text-xs font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20">${item.id || 'DATA'}</span></td>
+                            <td class="p-4 whitespace-nowrap text-xs text-gray-400">${item.date || '-'}</td>
+                            <td class="p-4 font-semibold text-white max-w-xs truncate">${title}</td>
+                            <td class="p-4 text-xs text-gray-400 max-w-md truncate">${content}</td>
+                        </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    tbody.innerHTML = "<tr><td colspan='4' class='text-center py-6 text-gray-500'>Belum ada data scraping di database.</td></tr>";
+                }
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                tbody.innerHTML = "<tr><td colspan='4' class='text-center py-6 text-red-400'>Gagal terhubung ke server gateway.</td></tr>";
+            });
+    }
+
+    // Panggil saat halaman pertama dibuka
+    loadTableData();
+
+    // --- 2. Logika Tombol Scraping Manual ---
+    document.getElementById('btn-manual-scrape').addEventListener('click', function() {
+        let btn = this;
+        let status = document.getElementById('manual-status');
+        
+        btn.disabled = true;
+        btn.innerHTML = "⏳ Sedang Crawling & Preprocessing...";
+        status.innerHTML = "";
+
+        fetch('http://127.0.0.1:4000/api/scrape/run', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = "▶️ Mulai Scraping Sekarang";
+                status.innerHTML = `<span class="text-green-400 bg-green-500/10 border border-green-500/20 px-3 py-1.5 rounded-lg inline-block">✅ Berhasil! ${data.saved || 0} data baru tersimpan. (${data.duplicates || 0} duplikat dibuang).</span>`;
+                loadTableData(); // Refresh tabel otomatis
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = "▶️ Mulai Scraping Sekarang";
+                status.innerHTML = `<span class="text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg inline-block">❌ Gagal melakukan scraping service.</span>`;
+            });
+    });
+
+    // --- 3. Logika Tombol Simpan Jadwal ---
+    document.getElementById('btn-save-schedule').addEventListener('click', function() {
+        let btn = this;
+        let jam = document.getElementById('schedule-hours').value;
+        let status = document.getElementById('schedule-status');
+        
+        btn.disabled = true;
+        status.innerHTML = "<span class='text-yellow-400'>Menyimpan konfigurasi jadwal...</span>";
+
+        fetch('http://127.0.0.1:4000/api/scrape/schedule', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hours: jam })
         })
-        .catch(err => console.error("Gagal memuat data:", err));
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            status.innerHTML = `<span class="text-green-400 bg-green-500/10 border border-green-500/20 px-3 py-1.5 rounded-lg inline-block">✅ Jadwal otomatis diatur setiap ${jam} Jam!</span>`;
+        })
+        .catch(err => {
+            btn.disabled = false;
+            status.innerHTML = `<span class="text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg inline-block">❌ Gagal memperbarui jadwal background.</span>`;
+        });
+    });
 </script>
 {% endblock %}

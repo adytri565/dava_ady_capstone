@@ -8,7 +8,8 @@ import os
 app = Flask(__name__)
 
 # Koneksi ke MongoDB (Sesuaikan dengan URI database Anda / Docker network)
-MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://capstone_db_user:capstone2026@cluster0.k6xslmu.mongodb.net/logisync_db?retryWrites=true&w=majority&tlsAllowInvalidCertificates=true")
+MONGO_URI = "mongodb://capstone_db_user:capstone2026@ac-4ipoqrj-shard-00-00.k6xslmu.mongodb.net:27017,ac-4ipoqrj-shard-00-01.k6xslmu.mongodb.net:27017,ac-4ipoqrj-shard-00-02.k6xslmu.mongodb.net:27017/?ssl=true&replicaSet=atlas-x5h8dw-shard-0&authSource=admin&appName=Cluster0"
+client = MongoClient(MONGO_URI)
 client = MongoClient(MONGO_URI)
 db = client["capstone_db"]
 collection = db["scraped_data"]
