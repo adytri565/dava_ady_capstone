@@ -77,7 +77,7 @@ def run_automated_scraping():
 
 # 4. SCHEDULING (AUTOMATISASI BACKGROUND)
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=run_automated_scraping, trigger="interval", hours=5, id="scrape_job", replace_existing=True)
+scheduler.add_job(func=run_automated_scraping, trigger="interval", hours=1, id="scrape_job", replace_existing=True)
 scheduler.start()
 
 # 5. ROUTES API UTAMA
@@ -117,7 +117,7 @@ def analyze_words():
 @app.route('/update-schedule', methods=['POST'])
 def update_schedule():
     data = request.json
-    hours = int(data.get('hours', 5))
+    hours = int(data.get('hours', 1))
     try:
         scheduler.reschedule_job('scrape_job', trigger='interval', hours=hours)
         return jsonify({"status": "success", "message": f"Otomatisasi diubah ke {hours} jam"})

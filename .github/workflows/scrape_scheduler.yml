@@ -2,8 +2,8 @@ name: Automated Web Scraping
 
 on:
   schedule:
-    - cron: '0 */5 * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *' # Berjalan otomatis setiap 1 jam sekali
+  workflow_dispatch:     # Memungkinkan tombol 'Run workflow' diklik manual
 
 jobs:
   scrape:
