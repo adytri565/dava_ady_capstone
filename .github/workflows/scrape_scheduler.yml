@@ -26,4 +26,4 @@ jobs:
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
         run: |
-          python scraping-service/run_script.py
+          python flask-capstone/scraping-service/run_script.py
